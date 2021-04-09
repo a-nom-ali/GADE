@@ -11,14 +11,14 @@ public class RandomUnsplash : MonoBehaviour
 {
     private static string _url = "https://picsum.photos/200";
 
-    private Image _unsplash;
+    private Image _image;
 
     private Coroutine _loadCoroutine;
 
     // Start is called before the first frame update
     void Start()
     {
-        _unsplash = GetComponent<Image>();
+        _image = GetComponent<Image>();
         LoadNewImage();
     }
 
@@ -27,6 +27,17 @@ public class RandomUnsplash : MonoBehaviour
         Debug.Log("LOADING");
         if (_loadCoroutine == null)
             _loadCoroutine = StartCoroutine(LoadNewImageCoroutine());
+        
+    }
+
+    private IEnumerator Waiter(float time)
+    {
+        while (true)
+        {
+            yield return new WaitForEndOfFrame();
+
+            Debug.Log("Done Waiting");
+        }
     }
 
     private IEnumerator LoadNewImageCoroutine()
@@ -47,7 +58,7 @@ public class RandomUnsplash : MonoBehaviour
             else
             {
                 var texture = DownloadHandlerTexture.GetContent(uwr);
-                _unsplash.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
+                _image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
                 Debug.Log(savePath);
                 System.IO.File.WriteAllText(savePath, uwr.downloadHandler.text);
             }

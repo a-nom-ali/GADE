@@ -79,11 +79,17 @@ namespace GADE2.UI
 
         private void OnDrawGizmos()
         {
+            var radius = 3f;
             Gizmos.color = Color.red;
             Gizmos.DrawLine(
                 new Vector3(1, _currentMinHeight, 0),
                 new Vector3(1, _currentMaxHeight, 0)
                 );
+            // Gizmos.color = Color.blue;
+            // Gizmos.DrawWireSphere(
+            //     new Vector3(1, _currentMinHeight, 0),
+            //     radius
+            //     );
         }
     }
 }
