@@ -26,11 +26,11 @@ public class TrackManager : MonoBehaviour
 
     public void NewSegment()
     {
-        var segment = Instantiate(m_Prefabs[Random.Range(0, m_Prefabs.Length)]);
-        segment.gameObject.SetActive(true);
+        var segment = Instantiate(m_Prefabs[Random.Range(0, m_Prefabs.Length)], transform);
         var pos = segment.transform.position;
         pos.z = _lastForward;
         segment.transform.position = pos;
+        segment.gameObject.SetActive(true);
 
         _lastForward += m_ForwardOffset;
     }

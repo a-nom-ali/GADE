@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float m_LaneWidth = 2f;
     private Rigidbody _rigidbody;
     private int _currentLane = 0;
+    private int _candies;
 
     public Vector3 CurrentLaneLerp
     {
@@ -19,6 +20,12 @@ public class Player : MonoBehaviour
             targetPosition.x = _currentLane * m_LaneWidth;
             return Vector3.Lerp(transform.position, targetPosition, Time.fixedDeltaTime * m_LaneChangeSpeed);
         }
+    }
+
+    public int Candies
+    {
+        get => _candies;
+        set => _candies = value;
     }
 
     // Start is called before the first frame update
@@ -52,7 +59,13 @@ public class Player : MonoBehaviour
     }    
     void FixedUpdate()
     {
-        _rigidbody.MovePosition(CurrentLaneLerp + Time.fixedDeltaTime * m_Speed * Vector3.forward);
+        var targetPosition = CurrentLaneLerp + Time.fixedDeltaTime * m_Speed * Vector3.forward;
+        
+        Vector3 direction = targetPosition - transform.position;
+        Quaternion toRotation = Quaternion.FromToRotation(transform.forward, direction);
+        transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, Time.fixedDeltaTime * m_LaneChangeSpeed);
+//        transform.LookAt(targetPosition);
+        _rigidbody.MovePosition(targetPosition);
     }
     
     private void Crouch()
@@ -75,4 +88,20 @@ public class Player : MonoBehaviour
         _currentLane = Mathf.Min(1, _currentLane + 1);
     }
 
+    public void Pickup(Pickup pickup)
+    {
+        switch (pickup.PickupType)
+        {
+            case PickupType.Candy:
+                var candy = ((CandyPickup) pickup);
+                _candies += candy.Count;
+                break;
+            case PickupType.Bubbles:
+                var bubbles = ((BubblesPickup) pickup);
+                break;
+            case PickupType.Formula:
+                var formula = ((FormulaPickup) pickup);
+                break;
+        }
+    }
 }
