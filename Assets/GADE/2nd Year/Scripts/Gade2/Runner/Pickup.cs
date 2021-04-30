@@ -20,7 +20,7 @@ public class Pickup : MonoBehaviour
         var player = other.GetComponent<Player>();
         player.Pickup(this);
 
-        if (m_Effect != default)
+        if (m_Effect != default(Transform))
         {
             Instantiate(m_Effect, transform.position, Quaternion.identity);
         }
