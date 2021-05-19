@@ -10,7 +10,7 @@ public enum PickupType
     Bubbles,
     Formula
 }
-public class Pickup : MonoBehaviour
+public abstract class Pickup : MonoBehaviour//, IPoolItem
 {
     [SerializeField] private Transform m_Effect;
     public virtual PickupType PickupType => PickupType.None;
@@ -27,4 +27,8 @@ public class Pickup : MonoBehaviour
         
         Destroy(gameObject);
     }
+
+    public abstract void PoolReset();
+
+    public abstract void ReturnToPool();
 }

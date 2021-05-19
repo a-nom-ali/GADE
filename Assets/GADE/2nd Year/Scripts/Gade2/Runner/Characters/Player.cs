@@ -8,9 +8,20 @@ public class Player : MonoBehaviour
     [SerializeField] private float m_Speed = 1f;
     [SerializeField] private float m_LaneChangeSpeed = 2f;
     [SerializeField] private float m_LaneWidth = 2f;
+    [SerializeField] private float m_JumpHeight = 2f;
+    [SerializeField] private float m_JumpForce = 2f;
     private Rigidbody _rigidbody;
     private int _currentLane = 0;
     private int _candies;
+    private bool _jumping;
+    private float _groundDistanceFromCenter;
+    
+    private bool Grounded => Physics.Raycast(
+        transform.position, 
+        Vector3.down, 
+        _groundDistanceFromCenter, 
+        1 << LayerMask.NameToLayer("Default")
+    );
 
     public Vector3 CurrentLaneLerp
     {
@@ -32,6 +43,8 @@ public class Player : MonoBehaviour
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        var boxCollider = GetComponent<BoxCollider>();
+        _groundDistanceFromCenter = boxCollider.size.y/2;
     }
 
     // Update is called once per frame
@@ -47,15 +60,16 @@ public class Player : MonoBehaviour
             Left();
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        Debug.Log(Grounded);
+        if (Input.GetKeyDown(KeyCode.UpArrow) && Grounded)
         {
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            Crouch();
-        }
+        // if (Input.GetKeyDown(KeyCode.DownArrow))
+        // {
+        //     Crouch();
+        // }
     }    
     void FixedUpdate()
     {
@@ -65,6 +79,16 @@ public class Player : MonoBehaviour
         Quaternion toRotation = Quaternion.FromToRotation(transform.forward, direction);
         transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, Time.fixedDeltaTime * m_LaneChangeSpeed);
 //        transform.LookAt(targetPosition);
+
+        // if (_jumping)
+        // {
+        //     if (targetPosition.y <= m_JumpHeight + _groundLevel)
+        //         targetPosition.y += Time.fixedDeltaTime * m_JumpForce;
+        //     else
+        //         _jumping = false;
+        //
+        //     //do something here
+        // }
         _rigidbody.MovePosition(targetPosition);
     }
     
@@ -75,7 +99,8 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        throw new System.NotImplementedException();
+        _rigidbody.AddForce(Vector3.up * m_JumpForce, ForceMode.Impulse);
+//        _jumping = true;
     }
 
     private void Left()
@@ -102,6 +127,14 @@ public class Player : MonoBehaviour
             case PickupType.Formula:
                 var formula = ((FormulaPickup) pickup);
                 break;
+        }
+    }
+
+    public void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Default"))
+        {
+            _groundDistanceFromCenter = transform.position.y;
         }
     }
 }
